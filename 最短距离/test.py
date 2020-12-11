@@ -2,9 +2,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 DIST_MAX=10
-station=np.array([[-12.856353,1.524696],[-5.68875,-2.168163],[27.818487,-12.002319],[-19.774317,20.724144],[18.884097,-16.146504],[-23.383704,6.219774],[24.125517,3.064488],[-11.09844,7.70784]])
+station=np.array([[-12.856353,1.524696],[-5.68875,-2.168163],[27.818487,-12.002319],[-19.774317,20.724144],[18.884097,-16.146504],[-23.383704,6.219774],[24.125517,3.064488],[-11.09844,7.70784],[10,-15],[0,-10]])
 solve_list=[]
-start=np.array([0,-10])
+# start=np.array([0,-10])
+start=np.array([20,-15])
 end=np.array([-21,20])
 
 # 画出连接ij两个站点的线段
@@ -42,13 +43,14 @@ def solve(now,close_end):
 def find_next(now,close_end):
     if(np.linalg.norm( station[now]-station[close_end] ) < DIST_MAX):
         return close_end
-    dist=[]
+    dot_list=[]
     for point in station:
-        np.dot(station[close_end]-station[now],point-station[now])
+        dot=np.dot(station[close_end]-station[now],point-station[now] )
+        dot_list.append(dot)
     # 对内积序列进行小到大排序，argsort返回索引
-    close_index_list=np.argsort(dist)
+    close_index_list=np.argsort(dot_list)
     for index in close_index_list[::-1]:
-        if( np.linalg.norm(station[now]-station [index] ) < DIST_MAX ):
+        if( np.linalg.norm(station[now]-station [index] ) < DIST_MAX and dot_list[index]>0 ):
             return index
     # 所有投影都不满足，直接走向最终点
     return close_end
@@ -67,20 +69,13 @@ if __name__ == '__main__':
     draw_link(end,close_end)
     draw_link(start,close_start)
     # 寻点存在solve_list中
-    solve_list.append(close_start).append(close_start)
+    solve_list.append(close_start)
     solve(close_start,close_end)
     solve_list.append(close_end)
     print(solve_list)
-    for i in range(len(solve_list)):
-        draw_line(solve_list[i-1],solve_list[i])
+    for i in range(len(solve_list)-1):
+        draw_line(solve_list[i],solve_list[i+1])
 
     # 画图
     plt.legend(loc='best')
     plt.show()
-
-
-
-
-
-
-
